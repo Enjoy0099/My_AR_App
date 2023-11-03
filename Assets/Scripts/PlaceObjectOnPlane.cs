@@ -7,10 +7,12 @@ using UnityEngine.XR.ARSubsystems;
 
 public class PlaceObjectOnPlane : MonoBehaviour
 {
+    public GameObject objectToPlace;
     public GameObject placementIndicator;
     private Pose placementPos;
     private Transform placementTransform;
     private bool placementPoseIsValid = false;
+    private bool isObjectPlaced = false;
     private TrackableId placedPlaneId = TrackableId.invalidId;
 
     ARRaycastManager m_RaycastManager;
@@ -23,13 +25,21 @@ public class PlaceObjectOnPlane : MonoBehaviour
 
     private void Update()
     {
-        UpdatePlacementPosition();
-        UpdatePlacementIndicator();
+        if (!isObjectPlaced)
+        {
+            UpdatePlacementPosition();
+            UpdatePlacementIndicator();
+
+            if (placementPoseIsValid && Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+            {
+                PlaceObject();
+            }
+        }
     }
 
     private void UpdatePlacementPosition()
     {
-        var screenCenter = Camera.current.ViewportToScreenPoint(new Vector3(0.5f, 0.5f));
+        var screenCenter = Camera.main.ViewportToScreenPoint(new Vector3(0.5f, 0.5f));
         if(m_RaycastManager.Raycast(screenCenter, s_Hits, TrackableType.PlaneWithinPolygon))
         {
             placementPoseIsValid = s_Hits.Count > 0;
@@ -59,7 +69,12 @@ public class PlaceObjectOnPlane : MonoBehaviour
         }
     }
 
-
+    private void PlaceObject()
+    {
+        Instantiate(objectToPlace, placementPos.position, placementTransform.rotation);
+        isObjectPlaced = true;
+        placementIndicator.SetActive(false);
+    }
 
 
 }
