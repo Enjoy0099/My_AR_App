@@ -18,6 +18,8 @@ public class PlaceObjectOnPlane : MonoBehaviour
     ARRaycastManager m_RaycastManager;
     static List<ARRaycastHit> s_Hits = new List<ARRaycastHit>();
 
+    public static event Action onPlacedObject;
+
     private void Awake()
     {
         m_RaycastManager = GetComponent<ARRaycastManager>();
@@ -72,6 +74,7 @@ public class PlaceObjectOnPlane : MonoBehaviour
     private void PlaceObject()
     {
         Instantiate(objectToPlace, placementPos.position, placementTransform.rotation);
+        onPlacedObject?.Invoke();
         isObjectPlaced = true;
         placementIndicator.SetActive(false);
     }
