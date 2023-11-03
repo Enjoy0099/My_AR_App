@@ -38,8 +38,10 @@ public class DartController : MonoBehaviour
                 if(raycastHit.collider.CompareTag("dart"))
                 {
                     raycastHit.collider.enabled = false;
-
                     DartTemp.transform.parent = aRSession.transform;
+
+                    Dart currentDartScript = DartTemp.GetComponent<Dart>();
+                    currentDartScript.isForceOK = true;
                 }
             }
         }
