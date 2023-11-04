@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 
@@ -8,8 +9,12 @@ public class DartController : MonoBehaviour
     public Transform DartThrowPoint;
     ARSessionOrigin aRSession;
     GameObject aRCam;
+    Transform DartboardObj;
     private GameObject DartTemp;
     private Rigidbody rb;
+    private bool isDartBoardSearched = false;
+    private float m_distanceFromDartBoard = 0;
+    public TMP_Text text_distance; 
 
     private void Start()
     {
@@ -33,28 +38,41 @@ public class DartController : MonoBehaviour
         {
             Ray raycast = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
             RaycastHit raycastHit;
-            if(Physics.Raycast(raycast, out raycastHit))
+            if (Physics.Raycast(raycast, out raycastHit))
             {
-                if(raycastHit.collider.CompareTag("dart"))
+                if (raycastHit.collider.CompareTag("dart"))
                 {
                     raycastHit.collider.enabled = false;
                     DartTemp.transform.parent = aRSession.transform;
 
                     Dart currentDartScript = DartTemp.GetComponent<Dart>();
                     currentDartScript.isForceOK = true;
+
+                    DartsInit();
                 }
             }
+        }
+
+        if (isDartBoardSearched)
+        {
+            m_distanceFromDartBoard = Vector3.Distance(DartboardObj.position, aRCam.transform.position);
+            text_distance.text = m_distanceFromDartBoard.ToString().Substring(0, 3);
         }
     }
 
     void DartsInit()
     {
+        DartboardObj = GameObject.FindWithTag("dart_board").transform;
+        if(DartboardObj)
+        {
+            isDartBoardSearched = true;
+        }
         StartCoroutine(WaitAndSpawnDart());
     }
 
     public IEnumerator WaitAndSpawnDart()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(1f);
         DartTemp = Instantiate(DartPrefab, DartThrowPoint.position, aRCam.transform.localRotation);
         DartTemp.transform.parent = aRCam.transform;
         rb = DartTemp.GetComponent<Rigidbody>();

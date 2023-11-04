@@ -9,6 +9,7 @@ public class Dart : MonoBehaviour
     public bool isForceOK = false;
     bool isDartRotating = false;
     bool isDartReadyToShoot = true;
+    bool isDartHitOnBoard = false;
 
     ARSessionOrigin aRSession;
     GameObject aRCam;
@@ -17,11 +18,12 @@ public class Dart : MonoBehaviour
 
     private void Start()
     {
-        aRSession = GameObject.Find("AR Session Origin").GetComponent<ARSessionOrigin>();
+        aRSession = GameObject.FindGameObjectWithTag("AR Session Origin").GetComponent<ARSessionOrigin>();
         aRCam = GameObject.Find("AR Camera").gameObject;
 
-        rb = gameObject.GetComponent<Rigidbody>();
-        dirObj = GameObject.Find("DartThrowPoint");
+        if(TryGetComponent(out Rigidbody rigid))
+        rb = rigid;
+        dirObj = GameObject.FindGameObjectWithTag("DartThrowPoint");
     }
 
     private void FixedUpdate()
@@ -52,6 +54,22 @@ public class Dart : MonoBehaviour
     IEnumerator InitDartDestroyVFX()
     {
         yield return new WaitForSeconds(5f);
-        Destroy(gameObject);
+        if(!isDartHitOnBoard)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("dart_board"))
+        {
+            Handheld.Vibrate();
+
+            GetComponent<Rigidbody>().isKinematic = true;
+            isDartRotating = false;
+
+            isDartHitOnBoard = true;
+        }
     }
 }
