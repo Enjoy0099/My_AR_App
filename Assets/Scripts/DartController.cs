@@ -77,5 +77,6 @@ public class DartController : MonoBehaviour
         DartTemp.transform.parent = aRCam.transform;
         rb = DartTemp.GetComponent<Rigidbody>();
         rb.isKinematic = true;
+        SoundManager.instance.play_dartReloadSound();
     }
 }
