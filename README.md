@@ -1,4 +1,4 @@
-# My_AR_App
+# AR_Dart_Game
 
 # About
 
